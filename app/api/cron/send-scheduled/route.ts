@@ -79,10 +79,18 @@ export async function GET(req: NextRequest) {
         .eq("id", entry.id)
 
       // Update lead's last_contacted_at and advance step
+      // Check if there are remaining scheduled emails for this lead
+      const { count } = await supabase
+        .from("outreach_log")
+        .select("id", { count: "exact", head: true })
+        .eq("lead_id", entry.lead_id)
+        .eq("status", "scheduled")
+        .neq("id", entry.id)
+
       await supabase
         .from("leads")
         .update({
-          status: "contacted",
+          status: (count ?? 0) > 0 ? "sequence_active" : "contacted",
           last_contacted_at: new Date().toISOString(),
           current_step_number: entry.step_number ?? 1,
         })
