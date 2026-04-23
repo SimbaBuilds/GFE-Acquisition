@@ -15,7 +15,7 @@
 
 ## Email Templates
 - [ ] **Personalize first lines** — The seeded templates have generic openings. Before enrolling each lead, customize the first line per prospect (their name, their medspa, specific pain point).
-- [ ] **Review/edit email copy** — Templates are in `email_sequences` / `sequence_steps` tables. Edit via Supabase dashboard or add an edit UI.
+- [ ] **Review/edit email copy** — Templates are now editable from the Sequences tab (hover a step → Edit). Review and customize before first outreach.
 
 ## Data Enrichment
 - [ ] **Add email addresses** — Most leads don't have email yet. Research and add via the lead detail panel.
@@ -28,6 +28,6 @@
 ## Nice-to-Haves
 - [ ] **Bulk actions** — Select multiple leads and enroll in sequence, change status, etc.
 - [ ] **CSV export** — Export filtered leads to CSV.
-- [ ] **Email preview with template interpolation** — Show the actual personalized email before sending (replace `{{physician}}`, `{{medspa}}`, etc.).
-- [ ] **Sequence step editor** — Edit email templates from the UI instead of directly in DB.
+- [x] **Email preview with template interpolation** — Done. Preview dialog shows personalized emails before enrolling. Individual steps can also be sent as one-offs.
+- [x] **Sequence step editor** — Done. Hover any step in the Sequences tab → Edit button. Inline editing of subject, body, channel, delay.
 - [ ] **LinkedIn DM tracking** — Manual log of LinkedIn messages sent (already supported via "Log a Note").
