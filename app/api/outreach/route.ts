@@ -2,6 +2,7 @@ import { createServiceClient } from "@/lib/supabase"
 import { interpolate } from "@/lib/interpolate"
 import type { Lead } from "@/lib/types"
 import { NextRequest, NextResponse } from "next/server"
+import { Resend } from "resend"
 
 export const dynamic = "force-dynamic"
 
@@ -94,18 +95,42 @@ export async function POST(req: NextRequest) {
   if (body.action === "send_email") {
     const { lead_id, subject, body: emailBody, to_email } = body
 
-    // TODO: Actually send via Resend when API key is configured
-    // For now, just log it
-    const logEntry = {
+    if (!to_email) {
+      return NextResponse.json({ error: "to_email is required" }, { status: 400 })
+    }
+
+    // Send via Resend
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    const { data: emailResult, error: sendError } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || "Cameron <cameron@medclearportal.com>",
+      to: to_email,
+      subject,
+      text: emailBody,
+    })
+
+    if (sendError) {
+      // Log as failed
+      await supabase.from("outreach_log").insert({
+        lead_id,
+        channel: "email" as const,
+        subject,
+        body: emailBody,
+        status: "failed" as const,
+        sent_at: new Date().toISOString(),
+      })
+      return NextResponse.json({ error: sendError.message }, { status: 500 })
+    }
+
+    // Log as sent
+    const { error: logError } = await supabase.from("outreach_log").insert({
       lead_id,
       channel: "email" as const,
       subject,
       body: emailBody,
       status: "sent" as const,
       sent_at: new Date().toISOString(),
-    }
-
-    const { error: logError } = await supabase.from("outreach_log").insert(logEntry)
+      resend_message_id: emailResult?.id ?? null,
+    })
     if (logError) return NextResponse.json({ error: logError.message }, { status: 500 })
 
     // Update lead
@@ -114,7 +139,7 @@ export async function POST(req: NextRequest) {
       .update({ status: "contacted", last_contacted_at: new Date().toISOString() })
       .eq("id", lead_id)
 
-    return NextResponse.json({ sent: true, note: "Resend integration pending — logged only" })
+    return NextResponse.json({ sent: true, resend_id: emailResult?.id })
   }
 
   // Manual note

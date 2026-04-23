@@ -89,7 +89,7 @@ export default function Dashboard() {
               <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center">
                 <Target className="h-4 w-4 text-white" />
               </div>
-              <h1 className="font-semibold text-lg">GFE Acquisition</h1>
+              <h1 className="font-semibold text-lg">MedClearPortal Customer Acquisition</h1>
             </div>
             <Badge className="bg-brand-subtle text-brand border-0 text-xs font-medium">
               {stats.total} leads

@@ -7,7 +7,7 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
 const fontMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata = {
-  title: "GFE Acquisition — Lead Tracking & Outreach",
+  title: "MedClearPortal Customer Acquisition — Lead Tracking & Outreach",
   description: "Client acquisition dashboard for GFE Clearance",
 }
 

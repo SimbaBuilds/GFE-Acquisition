@@ -1,4 +1,4 @@
-# GFE Acquisition — TODO
+# MedClearPortal Customer Acquisition — TODO
 
 ## Before First Outreach
 - [ ] **Set up Resend sending domain** — Register a separate domain (e.g. `gfeclearance-outreach.com`) to protect primary domain deliverability. Add DNS records in Resend dashboard.

@@ -112,7 +112,7 @@ Would it be worth 10 minutes to see how it works? We''re live in production doin
 Best,
 Cameron Hightower
 GFE Clearance
-cameron@gfeclearance.com', 'email'),
+cameron@medclearportal.com', 'email'),
 
   ('a0000000-0000-0000-0000-000000000001', 2, 6,
    'Managing GFEs across {{medspa_count}} locations?',
@@ -134,7 +134,7 @@ Cameron', 'email'),
 
 Last note — I built the GFE compliance platform that several Texas oversight practices now use daily. Synchronous video, automated documentation, one dashboard for all locations.
 
-If you''re open to a 10-minute call to see if it''s relevant, I''m at cameron@gfeclearance.com or you can grab a slot here: [booking link]
+If you''re open to a 10-minute call to see if it''s relevant, I''m at cameron@medclearportal.com or you can grab a slot here: [booking link]
 
 Either way, no worries.
 
