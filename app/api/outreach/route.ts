@@ -1,4 +1,6 @@
 import { createServiceClient } from "@/lib/supabase"
+import { interpolate } from "@/lib/interpolate"
+import type { Lead } from "@/lib/types"
 import { NextRequest, NextResponse } from "next/server"
 
 export const dynamic = "force-dynamic"
@@ -40,7 +42,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Sequence has no steps" }, { status: 400 })
     }
 
-    // Schedule all steps
+    // Fetch lead data for template interpolation
+    const { data: leadData } = await supabase
+      .from("leads")
+      .select("*")
+      .eq("id", lead_id)
+      .single()
+
+    // Schedule all steps with interpolated content
     const now = new Date()
     const logs = steps.map((step) => {
       const scheduledDate = new Date(now)
@@ -50,8 +59,12 @@ export async function POST(req: NextRequest) {
         sequence_id,
         step_number: step.step_number,
         channel: step.channel,
-        subject: step.subject_template,
-        body: step.body_template,
+        subject: leadData
+          ? interpolate(step.subject_template, leadData as Lead)
+          : step.subject_template,
+        body: leadData
+          ? interpolate(step.body_template, leadData as Lead)
+          : step.body_template,
         status: "scheduled" as const,
         scheduled_for: scheduledDate.toISOString(),
         sent_at: null,

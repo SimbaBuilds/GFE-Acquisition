@@ -216,7 +216,7 @@ export default function Dashboard() {
             <p className="text-sm text-muted-foreground mb-6">
               Pre-built outreach sequences. Enroll leads from the lead detail panel.
             </p>
-            <SequenceView sequences={sequences} />
+            <SequenceView sequences={sequences} onRefresh={fetchSequences} />
           </div>
         </TabsContent>
 

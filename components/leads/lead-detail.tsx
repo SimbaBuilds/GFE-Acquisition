@@ -23,17 +23,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { StatusBadge } from "./status-badge"
-import type { Lead, LeadStatus, EmailSequence, OutreachLogEntry } from "@/lib/types"
+import type { Lead, LeadStatus, EmailSequence, OutreachLogEntry, SequenceStep } from "@/lib/types"
+import { interpolate } from "@/lib/interpolate"
 import {
   ExternalLink,
   Mail,
   Phone,
   Link,
   Send,
+  Eye,
   PlayCircle,
   MessageSquare,
   Clock,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -52,6 +56,11 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
   const [sendBody, setSendBody] = useState("")
   const [noteBody, setNoteBody] = useState("")
   const [sendDialogOpen, setSendDialogOpen] = useState(false)
+
+  // Preview state
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewSequence, setPreviewSequence] = useState<EmailSequence | null>(null)
+  const [previewStepIdx, setPreviewStepIdx] = useState(0)
 
   const fetchLog = useCallback(async () => {
     const res = await fetch(`/api/outreach?lead_id=${lead.id}`)
@@ -79,17 +88,24 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
     await updateLead({ email: email || null, linkedin_url: linkedinUrl || null } as Partial<Lead>)
   }
 
-  async function enrollInSequence(sequenceId: string) {
+  function openPreview(seq: EmailSequence) {
+    setPreviewSequence(seq)
+    setPreviewStepIdx(0)
+    setPreviewOpen(true)
+  }
+
+  async function confirmEnroll() {
+    if (!previewSequence) return
     const res = await fetch("/api/outreach", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "enroll_sequence", lead_id: lead.id, sequence_id: sequenceId }),
+      body: JSON.stringify({ action: "enroll_sequence", lead_id: lead.id, sequence_id: previewSequence.id }),
     })
     if (res.ok) {
       const data = await res.json()
       toast.success(`Enrolled — ${data.scheduled} emails scheduled`)
+      setPreviewOpen(false)
       fetchLog()
-      // Refresh lead data
       const leadRes = await fetch(`/api/leads?search=${encodeURIComponent(lead.physician ?? "")}`)
       if (leadRes.ok) {
         const leads = await leadRes.json()
@@ -99,6 +115,12 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
     } else {
       toast.error("Failed to enroll")
     }
+  }
+
+  function prefillFromStep(step: SequenceStep) {
+    setSendSubject(interpolate(step.subject_template, lead))
+    setSendBody(interpolate(step.body_template, lead))
+    setSendDialogOpen(true)
   }
 
   async function sendEmail() {
@@ -139,6 +161,10 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
       fetchLog()
     }
   }
+
+  // Preview helpers
+  const previewSteps = previewSequence?.steps ?? []
+  const currentPreviewStep = previewSteps[previewStepIdx]
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -301,6 +327,7 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex gap-2 flex-wrap">
+              {/* Send Email Dialog */}
               <Dialog open={sendDialogOpen} onOpenChange={setSendDialogOpen}>
                 <DialogTrigger>
                   <Button size="sm" variant="outline">
@@ -308,7 +335,7 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
                     Send Email
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-lg">
                   <DialogHeader>
                     <DialogTitle>Send Email to {lead.physician || "Lead"}</DialogTitle>
                   </DialogHeader>
@@ -323,7 +350,7 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
                     </div>
                     <div>
                       <Label>Body</Label>
-                      <Textarea value={sendBody} onChange={(e) => setSendBody(e.target.value)} rows={8} />
+                      <Textarea value={sendBody} onChange={(e) => setSendBody(e.target.value)} rows={10} className="text-sm font-mono" />
                     </div>
                     <Button onClick={sendEmail}>
                       <Send className="h-4 w-4 mr-2" />
@@ -354,24 +381,43 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
 
             <Separator />
 
-            {/* Enroll in sequence */}
+            {/* Enroll in sequence — now with preview */}
             <div>
               <Label className="text-xs mb-1.5 block">Enroll in Email Sequence</Label>
-              <div className="flex gap-2">
-                {sequences.map((seq) => (
-                  <Button
-                    key={seq.id}
-                    size="sm"
-                    variant={lead.current_sequence_id === seq.id ? "secondary" : "outline"}
-                    onClick={() => enrollInSequence(seq.id)}
-                    disabled={lead.current_sequence_id === seq.id}
-                  >
-                    <PlayCircle className="h-3.5 w-3.5 mr-1.5" />
-                    {seq.name}
-                    {lead.current_sequence_id === seq.id && " (Active)"}
-                  </Button>
-                ))}
+              <div className="flex gap-2 flex-wrap">
+                {sequences.map((seq) => {
+                  const isActive = lead.current_sequence_id === seq.id
+                  return (
+                    <div key={seq.id} className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant={isActive ? "secondary" : "outline"}
+                        onClick={() => openPreview(seq)}
+                        disabled={isActive}
+                      >
+                        <Eye className="h-3.5 w-3.5 mr-1.5" />
+                        Preview & Enroll
+                        {isActive && " (Active)"}
+                      </Button>
+                    </div>
+                  )
+                })}
               </div>
+              {/* Also offer individual step sends */}
+              {sequences.map((seq) =>
+                seq.steps?.map((step) => (
+                  <Button
+                    key={step.id}
+                    size="sm"
+                    variant="ghost"
+                    className="mt-1 text-xs h-7"
+                    onClick={() => prefillFromStep(step)}
+                  >
+                    <Send className="h-3 w-3 mr-1" />
+                    Send Step {step.step_number} individually
+                  </Button>
+                ))
+              )}
             </div>
 
             <Separator />
@@ -444,6 +490,86 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
           </CardContent>
         </Card>
       </div>
+
+      {/* Sequence Preview Dialog */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>
+              Preview: {previewSequence?.name}
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Showing personalized emails for <strong>{lead.physician || lead.associated_medspa}</strong>
+            </p>
+          </DialogHeader>
+
+          {currentPreviewStep && (
+            <div className="flex-1 overflow-y-auto space-y-4">
+              {/* Step navigation */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">
+                    Step {currentPreviewStep.step_number} of {previewSteps.length}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    Day {currentPreviewStep.delay_days}
+                  </span>
+                  <Badge variant="secondary" className="text-xs capitalize">
+                    {currentPreviewStep.channel}
+                  </Badge>
+                </div>
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={previewStepIdx === 0}
+                    onClick={() => setPreviewStepIdx((i) => i - 1)}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={previewStepIdx === previewSteps.length - 1}
+                    onClick={() => setPreviewStepIdx((i) => i + 1)}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Subject */}
+              <div>
+                <Label className="text-xs text-muted-foreground">Subject</Label>
+                <div className="text-sm font-medium border rounded-md px-3 py-2 bg-muted/30">
+                  {interpolate(currentPreviewStep.subject_template, lead)}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div>
+                <Label className="text-xs text-muted-foreground">Body</Label>
+                <div className="text-sm border rounded-md px-3 py-3 bg-muted/30 whitespace-pre-wrap leading-relaxed max-h-[40vh] overflow-y-auto">
+                  {interpolate(currentPreviewStep.body_template, lead)}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <Separator />
+
+          <div className="flex items-center justify-between pt-2">
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmEnroll}>
+              <PlayCircle className="h-4 w-4 mr-2" />
+              Enroll in Sequence ({previewSteps.length} emails)
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
