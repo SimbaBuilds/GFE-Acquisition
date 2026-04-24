@@ -16,7 +16,8 @@ import { LeadsTable } from "@/components/leads/leads-table"
 import { LeadDetail } from "@/components/leads/lead-detail"
 import { SequenceView } from "@/components/sequences/sequence-view"
 import type { Lead, EmailSequence } from "@/lib/types"
-import { Search, Users, Mail, BarChart3, Target } from "lucide-react"
+import { Search, Users, Mail, BarChart3, Target, Activity } from "lucide-react"
+import { ActivityFeed } from "@/components/activity-feed"
 
 export default function Dashboard() {
   const [leads, setLeads] = useState<Lead[]>([])
@@ -126,6 +127,10 @@ export default function Dashboard() {
             <TabsTrigger value="sequences" className="gap-1.5">
               <Mail className="h-4 w-4" />
               Sequences
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="gap-1.5">
+              <Activity className="h-4 w-4" />
+              Activity
             </TabsTrigger>
             <TabsTrigger value="pipeline" className="gap-1.5">
               <BarChart3 className="h-4 w-4" />
@@ -239,6 +244,12 @@ export default function Dashboard() {
               Pre-built outreach sequences. Enroll leads from the lead detail panel.
             </p>
             <SequenceView sequences={sequences} onRefresh={fetchSequences} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="activity" className="flex-1 overflow-auto m-0 p-6 bg-muted/20">
+          <div className="max-w-3xl mx-auto">
+            <ActivityFeed />
           </div>
         </TabsContent>
 
