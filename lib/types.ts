@@ -69,3 +69,26 @@ export interface OutreachLogEntry {
   resend_message_id: string | null
   created_at: string
 }
+
+export type ScheduledTaskType = "sms"
+export type ScheduledTaskStatus = "scheduled" | "completed" | "failed" | "cancelled"
+
+export interface ScheduledTask {
+  id: string
+  task_type: ScheduledTaskType
+  payload: Record<string, unknown>
+  scheduled_for: string
+  status: ScheduledTaskStatus
+  attempts: number
+  last_error: string | null
+  last_response: Record<string, unknown> | null
+  completed_at: string | null
+  idempotency_key: string | null
+  notes: string | null
+  created_at: string
+}
+
+export interface SmsTaskPayload {
+  phone: string
+  message: string
+}
