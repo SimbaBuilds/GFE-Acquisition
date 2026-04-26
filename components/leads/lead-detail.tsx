@@ -210,6 +210,34 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
                 />
               </div>
             </div>
+
+            {/* LinkedIn state toggles */}
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => updateLead({ linkedin_connected: !lead.linkedin_connected } as Partial<Lead>)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  lead.linkedin_connected
+                    ? "bg-brand-subtle text-brand"
+                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${lead.linkedin_connected ? "bg-brand" : "bg-slate-400"}`} />
+                {lead.linkedin_connected ? "Connected" : "Not connected"}
+              </button>
+              <button
+                type="button"
+                onClick={() => updateLead({ linkedin_messaged: !lead.linkedin_messaged } as Partial<Lead>)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  lead.linkedin_messaged
+                    ? "bg-blue-50 text-blue-600"
+                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${lead.linkedin_messaged ? "bg-blue-500" : "bg-slate-400"}`} />
+                {lead.linkedin_messaged ? "Messaged" : "Not messaged"}
+              </button>
+            </div>
             {lead.phone && (
               <div className="flex items-center gap-2 text-sm">
                 <Phone className="h-3.5 w-3.5 text-muted-foreground" />

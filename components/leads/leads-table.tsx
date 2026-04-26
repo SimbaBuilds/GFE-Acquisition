@@ -34,9 +34,10 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
           <TableRow className="bg-muted/40">
             <TableHead className="w-[56px] text-[11px] uppercase tracking-wider font-semibold">Tier</TableHead>
             <TableHead className="w-[100px] text-[11px] uppercase tracking-wider font-semibold">Metro</TableHead>
-            <TableHead className="text-[11px] uppercase tracking-wider font-semibold">Physician</TableHead>
-            <TableHead className="text-[11px] uppercase tracking-wider font-semibold">Medspa</TableHead>
+            <TableHead className="w-[260px] text-[11px] uppercase tracking-wider font-semibold">Physician</TableHead>
+            <TableHead className="w-[260px] text-[11px] uppercase tracking-wider font-semibold">Medspa</TableHead>
             <TableHead className="w-[120px] text-[11px] uppercase tracking-wider font-semibold">Status</TableHead>
+            <TableHead className="w-[64px] text-[11px] uppercase tracking-wider font-semibold" title="LinkedIn: connected / messaged">LI</TableHead>
             <TableHead className="w-[110px] text-[11px] uppercase tracking-wider font-semibold">Phone</TableHead>
             <TableHead className="w-[44px] text-[11px] uppercase tracking-wider font-semibold">Web</TableHead>
           </TableRow>
@@ -44,7 +45,7 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
         <TableBody>
           {leads.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground py-12">
+              <TableCell colSpan={8} className="text-center text-muted-foreground py-12">
                 No leads found
               </TableCell>
             </TableRow>
@@ -71,24 +72,40 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
                   <span className="text-xs font-medium text-muted-foreground">{lead.metro}</span>
                 )}
               </TableCell>
-              <TableCell>
-                <div className="font-medium text-sm">{lead.physician || "—"}</div>
+              <TableCell className="max-w-[260px]">
+                <div className="font-medium text-sm truncate" title={lead.physician ?? undefined}>
+                  {lead.physician || "—"}
+                </div>
                 {lead.credentials && (
-                  <div className="text-xs text-muted-foreground truncate max-w-[250px]">
+                  <div className="text-xs text-muted-foreground truncate" title={lead.credentials}>
                     {lead.credentials}
                   </div>
                 )}
               </TableCell>
-              <TableCell>
-                <div className="text-sm">{lead.associated_medspa || "—"}</div>
+              <TableCell className="max-w-[260px]">
+                <div className="text-sm truncate" title={lead.associated_medspa ?? undefined}>
+                  {lead.associated_medspa || "—"}
+                </div>
                 {lead.medspa_owner_operator && (
-                  <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                  <div className="text-xs text-muted-foreground truncate" title={lead.medspa_owner_operator}>
                     {lead.medspa_owner_operator}
                   </div>
                 )}
               </TableCell>
               <TableCell>
                 <StatusBadge status={lead.status} />
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`w-2 h-2 rounded-full ${lead.linkedin_connected ? "bg-brand" : "bg-slate-200"}`}
+                    title={lead.linkedin_connected ? "Connected on LinkedIn" : "Not connected"}
+                  />
+                  <span
+                    className={`w-2 h-2 rounded-full ${lead.linkedin_messaged ? "bg-blue-500" : "bg-slate-200"}`}
+                    title={lead.linkedin_messaged ? "Messaged on LinkedIn" : "Not messaged"}
+                  />
+                </div>
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">{lead.phone || "—"}</TableCell>
               <TableCell>

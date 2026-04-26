@@ -25,6 +25,8 @@ export interface Lead {
   status: LeadStatus
   email: string | null
   linkedin_url: string | null
+  linkedin_connected: boolean
+  linkedin_messaged: boolean
   current_sequence_id: string | null
   current_step_number: number
   last_contacted_at: string | null
