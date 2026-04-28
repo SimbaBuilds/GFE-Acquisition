@@ -211,19 +211,47 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
               </div>
             </div>
 
-            {/* LinkedIn state toggles */}
+            {/* LinkedIn state toggles — connection cycles: none → requested → connected */}
             <div className="flex items-center gap-3 pt-1">
               <button
                 type="button"
-                onClick={() => updateLead({ linkedin_connected: !lead.linkedin_connected } as Partial<Lead>)}
+                onClick={() => {
+                  let updates: Partial<Lead>
+                  if (lead.linkedin_connected) {
+                    // Connected → reset to none
+                    updates = { linkedin_connected: false, linkedin_connection_requested: false } as Partial<Lead>
+                  } else if (lead.linkedin_connection_requested) {
+                    // Requested → connected
+                    updates = { linkedin_connected: true, linkedin_connection_requested: true } as Partial<Lead>
+                  } else {
+                    // None → requested
+                    updates = { linkedin_connection_requested: true } as Partial<Lead>
+                  }
+                  updateLead(updates)
+                }}
                 className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                   lead.linkedin_connected
                     ? "bg-brand-subtle text-brand"
-                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    : lead.linkedin_connection_requested
+                      ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                 }`}
+                title="Click to cycle: Not sent → Requested → Connected"
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${lead.linkedin_connected ? "bg-brand" : "bg-slate-400"}`} />
-                {lead.linkedin_connected ? "Connected" : "Not connected"}
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    lead.linkedin_connected
+                      ? "bg-brand"
+                      : lead.linkedin_connection_requested
+                        ? "bg-amber-500"
+                        : "bg-slate-400"
+                  }`}
+                />
+                {lead.linkedin_connected
+                  ? "Connected"
+                  : lead.linkedin_connection_requested
+                    ? "Request sent"
+                    : "Not connected"}
               </button>
               <button
                 type="button"

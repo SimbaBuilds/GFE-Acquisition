@@ -37,7 +37,7 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
             <TableHead className="w-[260px] text-[11px] uppercase tracking-wider font-semibold">Physician</TableHead>
             <TableHead className="w-[260px] text-[11px] uppercase tracking-wider font-semibold">Medspa</TableHead>
             <TableHead className="w-[120px] text-[11px] uppercase tracking-wider font-semibold">Status</TableHead>
-            <TableHead className="w-[64px] text-[11px] uppercase tracking-wider font-semibold" title="LinkedIn: connected / messaged">LI</TableHead>
+            <TableHead className="w-[80px] text-[11px] uppercase tracking-wider font-semibold" title="LinkedIn: requested / connected / messaged">LI</TableHead>
             <TableHead className="w-[110px] text-[11px] uppercase tracking-wider font-semibold">Phone</TableHead>
             <TableHead className="w-[44px] text-[11px] uppercase tracking-wider font-semibold">Web</TableHead>
           </TableRow>
@@ -97,6 +97,10 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
+                  <span
+                    className={`w-2 h-2 rounded-full ${lead.linkedin_connection_requested ? "bg-amber-500" : "bg-slate-200"}`}
+                    title={lead.linkedin_connection_requested ? "Connection request sent" : "No request sent"}
+                  />
                   <span
                     className={`w-2 h-2 rounded-full ${lead.linkedin_connected ? "bg-brand" : "bg-slate-200"}`}
                     title={lead.linkedin_connected ? "Connected on LinkedIn" : "Not connected"}
