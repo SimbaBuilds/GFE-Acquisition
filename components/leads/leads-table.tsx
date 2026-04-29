@@ -40,12 +40,13 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
             <TableHead className="w-[80px] text-[11px] uppercase tracking-wider font-semibold" title="LinkedIn: requested / connected / messaged">LI</TableHead>
             <TableHead className="w-[110px] text-[11px] uppercase tracking-wider font-semibold">Phone</TableHead>
             <TableHead className="w-[44px] text-[11px] uppercase tracking-wider font-semibold">Web</TableHead>
+            <TableHead className="w-[240px] text-[11px] uppercase tracking-wider font-semibold">Notes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {leads.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center text-muted-foreground py-12">
+              <TableCell colSpan={9} className="text-center text-muted-foreground py-12">
                 No leads found
               </TableCell>
             </TableRow>
@@ -132,6 +133,15 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
+                )}
+              </TableCell>
+              <TableCell className="max-w-[240px]">
+                {lead.latest_note ? (
+                  <div className="text-xs text-muted-foreground truncate" title={lead.latest_note}>
+                    {lead.latest_note}
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">—</span>
                 )}
               </TableCell>
             </TableRow>

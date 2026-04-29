@@ -29,7 +29,33 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+
+  const leadIds = (data ?? []).map((l) => l.id)
+  let latestNoteByLead = new Map<string, { body: string | null; created_at: string }>()
+  if (leadIds.length > 0) {
+    const { data: notes } = await supabase
+      .from("outreach_log")
+      .select("lead_id, body, created_at")
+      .eq("channel", "manual_note")
+      .in("lead_id", leadIds)
+      .order("created_at", { ascending: false })
+    for (const n of notes ?? []) {
+      if (!latestNoteByLead.has(n.lead_id)) {
+        latestNoteByLead.set(n.lead_id, { body: n.body, created_at: n.created_at })
+      }
+    }
+  }
+
+  const enriched = (data ?? []).map((l) => {
+    const latest = latestNoteByLead.get(l.id)
+    return {
+      ...l,
+      latest_note: latest?.body ?? null,
+      latest_note_at: latest?.created_at ?? null,
+    }
+  })
+
+  return NextResponse.json(enriched)
 }
 
 export async function PATCH(req: NextRequest) {

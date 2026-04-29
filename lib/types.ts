@@ -36,6 +36,8 @@ export interface Lead {
   tags: string[]
   created_at: string
   updated_at: string
+  latest_note: string | null
+  latest_note_at: string | null
 }
 
 export interface EmailSequence {
