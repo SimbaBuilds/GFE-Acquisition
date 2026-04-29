@@ -96,20 +96,29 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
                 <StatusBadge status={lead.status} />
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-1">
+                {lead.linkedin_not_found ? (
                   <span
-                    className={`w-2 h-2 rounded-full ${lead.linkedin_connection_requested ? "bg-amber-500" : "bg-slate-200"}`}
-                    title={lead.linkedin_connection_requested ? "Connection request sent" : "No request sent"}
-                  />
-                  <span
-                    className={`w-2 h-2 rounded-full ${lead.linkedin_connected ? "bg-brand" : "bg-slate-200"}`}
-                    title={lead.linkedin_connected ? "Connected on LinkedIn" : "Not connected"}
-                  />
-                  <span
-                    className={`w-2 h-2 rounded-full ${lead.linkedin_messaged ? "bg-blue-500" : "bg-slate-200"}`}
-                    title={lead.linkedin_messaged ? "Messaged on LinkedIn" : "Not messaged"}
-                  />
-                </div>
+                    className="text-rose-500 text-xs font-semibold"
+                    title="No LinkedIn profile found"
+                  >
+                    ✕
+                  </span>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <span
+                      className={`w-2 h-2 rounded-full ${lead.linkedin_connection_requested ? "bg-amber-500" : "bg-slate-200"}`}
+                      title={lead.linkedin_connection_requested ? "Connection request sent" : "No request sent"}
+                    />
+                    <span
+                      className={`w-2 h-2 rounded-full ${lead.linkedin_connected ? "bg-brand" : "bg-slate-200"}`}
+                      title={lead.linkedin_connected ? "Connected on LinkedIn" : "Not connected"}
+                    />
+                    <span
+                      className={`w-2 h-2 rounded-full ${lead.linkedin_messaged ? "bg-blue-500" : "bg-slate-200"}`}
+                      title={lead.linkedin_messaged ? "Messaged on LinkedIn" : "Not messaged"}
+                    />
+                  </div>
+                )}
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">{lead.phone || "—"}</TableCell>
               <TableCell>

@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   const supabase = createServiceClient()
   const resend = new Resend(process.env.RESEND_API_KEY)
-  const fromEmail = process.env.RESEND_FROM_EMAIL || "Cameron <cameron@medclearportal.com>"
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "Cameron <cameron.hightower@medclearportal.com>"
 
   // Find all scheduled outreach entries that are due
   const now = new Date().toISOString()

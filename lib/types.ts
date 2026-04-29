@@ -25,6 +25,7 @@ export interface Lead {
   status: LeadStatus
   email: string | null
   linkedin_url: string | null
+  linkedin_not_found: boolean
   linkedin_connection_requested: boolean
   linkedin_connected: boolean
   linkedin_messaged: boolean

@@ -85,7 +85,11 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
   }
 
   async function saveContactInfo() {
-    await updateLead({ email: email || null, linkedin_url: linkedinUrl || null } as Partial<Lead>)
+    const updates: Partial<Lead> = { email: email || null, linkedin_url: linkedinUrl || null } as Partial<Lead>
+    if (linkedinUrl && lead.linkedin_not_found) {
+      ;(updates as Partial<Lead>).linkedin_not_found = false
+    }
+    await updateLead(updates)
   }
 
   function openPreview(seq: EmailSequence) {
@@ -212,9 +216,10 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
             </div>
 
             {/* LinkedIn state toggles — connection cycles: none → requested → connected */}
-            <div className="flex items-center gap-3 pt-1">
+            <div className="flex items-center gap-3 pt-1 flex-wrap">
               <button
                 type="button"
+                disabled={lead.linkedin_not_found}
                 onClick={() => {
                   let updates: Partial<Lead>
                   if (lead.linkedin_connected) {
@@ -229,14 +234,14 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
                   }
                   updateLead(updates)
                 }}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                   lead.linkedin_connected
                     ? "bg-brand-subtle text-brand"
                     : lead.linkedin_connection_requested
                       ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
                       : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                 }`}
-                title="Click to cycle: Not sent → Requested → Connected"
+                title={lead.linkedin_not_found ? "Disabled — marked as no profile found" : "Click to cycle: Not sent → Requested → Connected"}
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
@@ -255,8 +260,9 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
               </button>
               <button
                 type="button"
+                disabled={lead.linkedin_not_found}
                 onClick={() => updateLead({ linkedin_messaged: !lead.linkedin_messaged } as Partial<Lead>)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                   lead.linkedin_messaged
                     ? "bg-blue-50 text-blue-600"
                     : "bg-slate-100 text-slate-500 hover:bg-slate-200"
@@ -264,6 +270,30 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${lead.linkedin_messaged ? "bg-blue-500" : "bg-slate-400"}`} />
                 {lead.linkedin_messaged ? "Messaged" : "Not messaged"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (lead.linkedin_not_found) {
+                    updateLead({ linkedin_not_found: false } as Partial<Lead>)
+                  } else {
+                    updateLead({
+                      linkedin_not_found: true,
+                      linkedin_connection_requested: false,
+                      linkedin_connected: false,
+                      linkedin_messaged: false,
+                    } as Partial<Lead>)
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  lead.linkedin_not_found
+                    ? "bg-rose-50 text-rose-700 hover:bg-rose-100"
+                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                }`}
+                title="Mark that no LinkedIn profile exists for this lead"
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${lead.linkedin_not_found ? "bg-rose-500" : "bg-slate-400"}`} />
+                {lead.linkedin_not_found ? "No profile found" : "Mark no profile found"}
               </button>
             </div>
             {lead.phone && (
@@ -385,11 +415,9 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
             <div className="flex gap-2 flex-wrap">
               {/* Send Email Dialog */}
               <Dialog open={sendDialogOpen} onOpenChange={setSendDialogOpen}>
-                <DialogTrigger>
-                  <Button size="sm" variant="outline">
-                    <Mail className="h-3.5 w-3.5 mr-1.5" />
-                    Send Email
-                  </Button>
+                <DialogTrigger render={<Button size="sm" variant="outline" />}>
+                  <Mail className="h-3.5 w-3.5 mr-1.5" />
+                  Send Email
                 </DialogTrigger>
                 <DialogContent className="max-w-lg">
                   <DialogHeader>
