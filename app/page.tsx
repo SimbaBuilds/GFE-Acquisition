@@ -165,6 +165,7 @@ export default function Dashboard() {
                     <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="new">New</SelectItem>
                     <SelectItem value="contacted">Contacted</SelectItem>
+                    <SelectItem value="practice_email_obtained">Practice Email Obtained</SelectItem>
                     <SelectItem value="sequence_active">Sequence Active</SelectItem>
                     <SelectItem value="replied">Replied</SelectItem>
                     <SelectItem value="meeting_booked">Meeting Booked</SelectItem>

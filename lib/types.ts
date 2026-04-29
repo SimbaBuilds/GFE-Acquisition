@@ -1,6 +1,7 @@
 export type LeadStatus =
   | "new"
   | "contacted"
+  | "practice_email_obtained"
   | "sequence_active"
   | "replied"
   | "meeting_booked"
@@ -19,6 +20,7 @@ export interface Lead {
   medspa_owner_operator: string | null
   medspa_location: string | null
   phone: string | null
+  practice_email: string | null
   website: string | null
   source_url: string | null
   notes: string | null

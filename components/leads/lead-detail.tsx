@@ -52,6 +52,8 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
   const [outreachLog, setOutreachLog] = useState<OutreachLogEntry[]>([])
   const [email, setEmail] = useState(lead.email ?? "")
   const [linkedinUrl, setLinkedinUrl] = useState(lead.linkedin_url ?? "")
+  const [phone, setPhone] = useState(lead.phone ?? "")
+  const [practiceEmail, setPracticeEmail] = useState(lead.practice_email ?? "")
   const [sendSubject, setSendSubject] = useState("")
   const [sendBody, setSendBody] = useState("")
   const [noteBody, setNoteBody] = useState("")
@@ -85,7 +87,7 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
   }
 
   async function saveContactInfo() {
-    const updates: Partial<Lead> = { email: email || null, linkedin_url: linkedinUrl || null } as Partial<Lead>
+    const updates: Partial<Lead> = { email: email || null, linkedin_url: linkedinUrl || null, phone: phone || null, practice_email: practiceEmail || null } as Partial<Lead>
     if (linkedinUrl && lead.linkedin_not_found) {
       ;(updates as Partial<Lead>).linkedin_not_found = false
     }
@@ -213,6 +215,26 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
                   className="h-8 text-sm"
                 />
               </div>
+              <div>
+                <Label className="text-xs">Phone</Label>
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Add phone..."
+                  className="h-8 text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Practice Email</Label>
+                <Input
+                  type="email"
+                  value={practiceEmail}
+                  onChange={(e) => setPracticeEmail(e.target.value)}
+                  placeholder="Office email from call..."
+                  className="h-8 text-sm"
+                />
+              </div>
             </div>
 
             {/* LinkedIn state toggles — connection cycles: none → requested → connected */}
@@ -296,12 +318,6 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
                 {lead.linkedin_not_found ? "No profile found" : "Mark no profile found"}
               </button>
             </div>
-            {lead.phone && (
-              <div className="flex items-center gap-2 text-sm">
-                <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>{lead.phone}</span>
-              </div>
-            )}
             {lead.website && (
               <div className="flex items-center gap-2 text-sm">
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
@@ -395,6 +411,7 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
               <SelectContent>
                 <SelectItem value="new">New</SelectItem>
                 <SelectItem value="contacted">Contacted</SelectItem>
+                <SelectItem value="practice_email_obtained">Practice Email Obtained</SelectItem>
                 <SelectItem value="sequence_active">Sequence Active</SelectItem>
                 <SelectItem value="replied">Replied</SelectItem>
                 <SelectItem value="meeting_booked">Meeting Booked</SelectItem>

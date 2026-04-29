@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   const search = url.get("search")
   if (search) {
     query = query.or(
-      `physician.ilike.%${search}%,associated_medspa.ilike.%${search}%,notes.ilike.%${search}%,medspa_location.ilike.%${search}%`
+      `physician.ilike.%${search}%,associated_medspa.ilike.%${search}%,notes.ilike.%${search}%,medspa_location.ilike.%${search}%,practice_email.ilike.%${search}%`
     )
   }
 

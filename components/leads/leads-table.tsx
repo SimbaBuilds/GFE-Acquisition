@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { StatusBadge } from "./status-badge"
 import type { Lead } from "@/lib/types"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Mail } from "lucide-react"
 
 interface LeadsTableProps {
   leads: Lead[]
@@ -39,6 +39,7 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
             <TableHead className="w-[120px] text-[11px] uppercase tracking-wider font-semibold">Status</TableHead>
             <TableHead className="w-[80px] text-[11px] uppercase tracking-wider font-semibold" title="LinkedIn: requested / connected / messaged">LI</TableHead>
             <TableHead className="w-[110px] text-[11px] uppercase tracking-wider font-semibold">Phone</TableHead>
+            <TableHead className="w-[44px] text-[11px] uppercase tracking-wider font-semibold" title="Practice email obtained">PE</TableHead>
             <TableHead className="w-[44px] text-[11px] uppercase tracking-wider font-semibold">Web</TableHead>
             <TableHead className="w-[240px] text-[11px] uppercase tracking-wider font-semibold">Notes</TableHead>
           </TableRow>
@@ -46,7 +47,7 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
         <TableBody>
           {leads.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="text-center text-muted-foreground py-12">
+              <TableCell colSpan={10} className="text-center text-muted-foreground py-12">
                 No leads found
               </TableCell>
             </TableRow>
@@ -122,6 +123,15 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
                 )}
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">{lead.phone || "—"}</TableCell>
+              <TableCell>
+                {lead.practice_email ? (
+                  <span title={lead.practice_email} className="inline-flex">
+                    <Mail className="h-3.5 w-3.5 text-teal-600" />
+                  </span>
+                ) : (
+                  <span className="w-2 h-2 rounded-full bg-slate-200 inline-block" title="No practice email" />
+                )}
+              </TableCell>
               <TableCell>
                 {lead.website && (
                   <a
