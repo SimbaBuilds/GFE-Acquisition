@@ -160,3 +160,22 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ error: "Unknown action" }, { status: 400 })
 }
+
+// Edit a manual note's body
+export async function PATCH(req: NextRequest) {
+  const supabase = createServiceClient()
+  const { id, body: noteBody } = await req.json()
+  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 })
+
+  const { data, error } = await supabase
+    .from("outreach_log")
+    .update({ body: noteBody })
+    .eq("id", id)
+    .eq("channel", "manual_note")
+    .select()
+    .single()
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!data) return NextResponse.json({ error: "Not found or not editable" }, { status: 404 })
+  return NextResponse.json(data)
+}

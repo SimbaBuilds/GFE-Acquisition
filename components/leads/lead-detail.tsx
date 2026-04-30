@@ -38,6 +38,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Pencil,
+  Check,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -57,6 +59,8 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
   const [sendSubject, setSendSubject] = useState("")
   const [sendBody, setSendBody] = useState("")
   const [noteBody, setNoteBody] = useState("")
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
+  const [editingNoteBody, setEditingNoteBody] = useState("")
   const [sendDialogOpen, setSendDialogOpen] = useState(false)
 
   // Preview state
@@ -151,6 +155,23 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
       setSendSubject("")
       setSendBody("")
       fetchLog()
+    }
+  }
+
+  async function saveEditedNote() {
+    if (!editingNoteId) return
+    const res = await fetch("/api/outreach", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: editingNoteId, body: editingNoteBody }),
+    })
+    if (res.ok) {
+      toast.success("Note updated")
+      setEditingNoteId(null)
+      setEditingNoteBody("")
+      fetchLog()
+    } else {
+      toast.error("Failed to update note")
     }
   }
 
@@ -583,8 +604,50 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
                       {entry.subject && (
                         <div className="font-medium mt-0.5 truncate">{entry.subject}</div>
                       )}
-                      {entry.body && (
-                        <div className="text-muted-foreground mt-0.5 line-clamp-2">{entry.body}</div>
+                      {entry.channel === "manual_note" && editingNoteId === entry.id ? (
+                        <div className="mt-1 space-y-1">
+                          <Textarea
+                            value={editingNoteBody}
+                            onChange={(e) => setEditingNoteBody(e.target.value)}
+                            rows={3}
+                            className="text-sm"
+                          />
+                          <div className="flex gap-1">
+                            <Button size="sm" onClick={saveEditedNote} className="h-7">
+                              <Check className="h-3.5 w-3.5 mr-1" /> Save
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingNoteId(null)
+                                setEditingNoteBody("")
+                              }}
+                              className="h-7"
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-2">
+                          {entry.body && (
+                            <div className="text-muted-foreground mt-0.5 line-clamp-2 flex-1">{entry.body}</div>
+                          )}
+                          {entry.channel === "manual_note" && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingNoteId(entry.id)
+                                setEditingNoteBody(entry.body ?? "")
+                              }}
+                              className="text-muted-foreground hover:text-foreground shrink-0 p-0.5"
+                              title="Edit note"
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
