@@ -171,6 +171,7 @@ export default function Dashboard() {
                     <SelectItem value="meeting_booked">Meeting Booked</SelectItem>
                     <SelectItem value="closed_won">Closed Won</SelectItem>
                     <SelectItem value="closed_lost">Closed Lost</SelectItem>
+                    <SelectItem value="low_priority">Low Priority</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

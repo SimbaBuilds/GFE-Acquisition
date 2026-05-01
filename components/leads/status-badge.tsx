@@ -11,6 +11,7 @@ const STATUS_CONFIG: Record<LeadStatus, { label: string; className: string }> = 
   closed_won: { label: "Won", className: "bg-brand-subtle text-brand hover:bg-brand-subtle border-0" },
   closed_lost: { label: "Lost", className: "bg-red-50 text-red-600 hover:bg-red-50 border-0" },
   unsubscribed: { label: "Unsubscribed", className: "bg-orange-50 text-orange-600 hover:bg-orange-50 border-0" },
+  low_priority: { label: "Low Priority", className: "bg-zinc-100 text-zinc-500 hover:bg-zinc-100 border-0" },
 }
 
 export function StatusBadge({ status }: { status: LeadStatus }) {

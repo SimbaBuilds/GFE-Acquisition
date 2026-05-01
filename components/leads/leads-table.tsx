@@ -32,6 +32,7 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/40">
+            <TableHead className="w-[44px] text-[11px] uppercase tracking-wider font-semibold">#</TableHead>
             <TableHead className="w-[56px] text-[11px] uppercase tracking-wider font-semibold">Tier</TableHead>
             <TableHead className="w-[100px] text-[11px] uppercase tracking-wider font-semibold">Metro</TableHead>
             <TableHead className="w-[260px] text-[11px] uppercase tracking-wider font-semibold">Physician</TableHead>
@@ -47,12 +48,12 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
         <TableBody>
           {leads.length === 0 && (
             <TableRow>
-              <TableCell colSpan={10} className="text-center text-muted-foreground py-12">
+              <TableCell colSpan={11} className="text-center text-muted-foreground py-12">
                 No leads found
               </TableCell>
             </TableRow>
           )}
-          {leads.map((lead) => (
+          {leads.map((lead, index) => (
             <TableRow
               key={lead.id}
               className={`cursor-pointer transition-colors ${
@@ -62,6 +63,9 @@ export function LeadsTable({ leads, selectedId, onSelect }: LeadsTableProps) {
               }`}
               onClick={() => onSelect(lead)}
             >
+              <TableCell className="text-xs text-muted-foreground tabular-nums">
+                {index + 1}
+              </TableCell>
               <TableCell>
                 {lead.tier && (
                   <Badge className={`text-[11px] px-1.5 py-0 font-semibold ${TIER_STYLES[lead.tier] ?? "bg-slate-100 text-slate-500"}`}>

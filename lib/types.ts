@@ -8,6 +8,7 @@ export type LeadStatus =
   | "closed_won"
   | "closed_lost"
   | "unsubscribed"
+  | "low_priority"
 
 export interface Lead {
   id: string

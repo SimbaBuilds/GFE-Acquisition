@@ -439,6 +439,7 @@ export function LeadDetail({ lead, sequences, onUpdate, onClose }: LeadDetailPro
                 <SelectItem value="closed_won">Closed Won</SelectItem>
                 <SelectItem value="closed_lost">Closed Lost</SelectItem>
                 <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+                <SelectItem value="low_priority">Low Priority</SelectItem>
               </SelectContent>
             </Select>
           </CardContent>
